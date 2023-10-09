@@ -5,7 +5,7 @@
 #include <QString>
 #include <QStringList>
 #include <QLineEdit>
-#include <QComboBox>
+#include <QListWidget>
 #include <QGroupBox>
 #include <QBoxLayout>
 #include "WordFinderWorker.h"
@@ -21,17 +21,18 @@ public:
 
 private:
 	const unsigned int DEFAULT_NB_RESULTS{ 25 };
-	const QString DEFAULT_WORD_LIST_FOLDER{ "Word-lists" };
-	const QString DEFAULT_WORD_LIST_PATH{ DEFAULT_WORD_LIST_FOLDER + '/' + "francais.txt" };
+	const QString APP_PATH;
+	inline static const QString WORD_LIST_FOLDER{ "Word-lists" };
+	inline static const QString DEFAULT_WORD_LIST{ WORD_LIST_FOLDER + '/' + "francais.txt"};
 
 	QStringList wordList;
 
 	QLineEdit* searchInput;
-	QComboBox* resultsComboBox;
+	QListWidget* resultsList;
 
 	QGroupBox* initParameters();
 	QHBoxLayout* initSearch();
-	QHBoxLayout* initResults();
+	QVBoxLayout* initResults();
 
 	WordFinderWorker* wordFinderWorker;
 	QThread workerThread;

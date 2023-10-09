@@ -8,7 +8,7 @@ Component.prototype.createOperations = function()
     component.createOperations();
 
     if (systemInfo.productType === "windows") {
-        component.addOperation("CreateShortcut", "@TargetDir@/AutoClicker.exe", "@StartMenuDir@/AutoClicker.lnk",
+        component.addOperation("CreateShortcut", "@TargetDir@/Word-finder.exe", "@StartMenuDir@/Word-finder.lnk",
             "workingDirectory=@TargetDir@");
     }
 }

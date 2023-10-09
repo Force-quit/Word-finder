@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Installer>
-    <Name>AutoClicker</Name>
-    <Version>1.2.0</Version>
-    <Title>AutoClicker installer</Title>
+    <Name>Word-finder</Name>
+    <Version>4.0</Version>
+    <Title>Word-finder installer</Title>
     <Publisher>Émile Laforce</Publisher>
-    <InstallerApplicationIcon>../../Resources/mouse</InstallerApplicationIcon>
+    <InstallerApplicationIcon>../../Resources/glass</InstallerApplicationIcon>
     <StartMenuDir>Emalice</StartMenuDir>
     <WizardStyle>Modern</WizardStyle>
-    <TargetDir>@ApplicationsDir@/Emalice/AutoClicker</TargetDir>
+    <TargetDir>@ApplicationsDir@/Emalice/Word-finder</TargetDir>
 </Installer>
