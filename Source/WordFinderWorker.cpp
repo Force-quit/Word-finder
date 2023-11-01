@@ -21,7 +21,7 @@ void WordFinderWorker::setMaxResults(const unsigned int nbResults)
 void WordFinderWorker::findWords(const QString& pattern)
 {
 	QStringList results;
-	if (pattern != "")
+	if (!pattern.isEmpty())
 	{
 		unsigned int counter = 0;
 		for (unsigned int i = 0; i < wordListRef.size() && counter != maxResults && nbCalls == 1; ++i)
@@ -41,5 +41,6 @@ void WordFinderWorker::findWords(const QString& pattern)
 	}
 
 	--nbCalls;
-	emit wordsFound(results);
+	if (!results.isEmpty())
+		emit wordsFound(results);
 }

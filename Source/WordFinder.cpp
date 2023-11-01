@@ -8,6 +8,7 @@
 #include <QString>
 #include <QFileDialog>
 #include <EQUtilities/EQIntLineEdit.h>
+#include <EQUtilities/EQTextValidator.h>
 #include <QLineEdit>
 #include <QRegularExpression>
 #include <QStringList>
@@ -32,9 +33,9 @@ WordFinder::WordFinder(QWidget* parent)
 
 	QVBoxLayout* centralLayout{ new QVBoxLayout };
 
-	QGroupBox* parametersGroupBox = initParameters();
-	QHBoxLayout* searchLayout = initSearch();
-	QVBoxLayout* resultsLayout = initResults();
+	QGroupBox* parametersGroupBox{ initParameters() };
+	QHBoxLayout* searchLayout{ initSearch() };
+	QVBoxLayout* resultsLayout{ initResults() };
 
 	centralLayout->addWidget(parametersGroupBox);
 	centralLayout->addLayout(searchLayout);
@@ -90,7 +91,7 @@ QHBoxLayout* WordFinder::initSearch()
 	QLabel* searchLabel{ new QLabel("Pattern to find :") };
 
 	searchInput = new QLineEdit;
-	searchInput->setValidator(new QRegularExpressionValidator(QRegularExpression(QString::fromUtf8("\\p{L}+"))));
+	searchInput->setValidator(new EQTextValidator);
 	connect(searchInput, &QLineEdit::textEdited, [this]() {wordFinderWorker->queueWork(); });
 	connect(searchInput, &QLineEdit::textEdited, wordFinderWorker, &WordFinderWorker::findWords);
 	connect(wordFinderWorker, &WordFinderWorker::wordsFound, [this](const QStringList& result) {
@@ -117,7 +118,7 @@ QVBoxLayout* WordFinder::initResults()
 	connect(resultsButton, &QPushButton::clicked, [this]() {
 		if (QListWidgetItem * selectedItem{ resultsList->currentItem() })
 			QGuiApplication::clipboard()->setText(selectedItem->text());
-	});
+		});
 
 	resultsLayout->addWidget(resultsList);
 	resultsLayout->addWidget(resultsButton);
