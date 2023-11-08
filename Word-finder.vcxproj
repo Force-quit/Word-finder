@@ -63,6 +63,24 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutDir>deployment\components\com.vendor.product\data\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Label="QtDeploy" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <QtDeploy>true</QtDeploy>
+    <QtDeployDebugRelease>
+    </QtDeployDebugRelease>
+    <QtDeployNoPatchQt>
+    </QtDeployNoPatchQt>
+    <QtDeployNoPlugins>
+    </QtDeployNoPlugins>
+    <QtDeployNoLibraries>
+    </QtDeployNoLibraries>
+    <QtDeployNoQuickImport>
+    </QtDeployNoQuickImport>
+    <QtDeployNoSystemD3dCompiler>
+    </QtDeployNoSystemD3dCompiler>
+    <QtDeployNoVirtualKeyboard>
+    </QtDeployNoVirtualKeyboard>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -74,8 +92,7 @@
       <AdditionalDependencies>EQUtilities.lib;%(AdditionalDependencies);$(Qt_LIBS_)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /d "Resources\glass.png" "$(OutDir)"
-xcopy /y /d /i "Word-lists" "$(OutDir)Word-lists"</Command>
+      <Command>xcopy /y /d /i "Word-lists" "$(OutDir)Word-lists"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -88,9 +105,12 @@ xcopy /y /d /i "Word-lists" "$(OutDir)Word-lists"</Command>
       <AdditionalDependencies>EQUtilities.lib;%(AdditionalDependencies);$(Qt_LIBS_)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /d "Resources\glass.png" "$(OutDir)"
-xcopy /y /d /i "Word-lists" "$(OutDir)Word-lists"</Command>
+      <Command>xcopy /y /d /i "Word-lists" "$(OutDir)Word-lists"
+xcopy /y "$(SolutionDir)$(Platform)\$(Configuration)\EQUtilities.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>rd /s /q "$(TargetDir)"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
@@ -136,6 +156,9 @@ xcopy /y /d /i "Word-lists" "$(OutDir)Word-lists"</Command>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources\Word-finder.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="Resources\Resource.qrc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

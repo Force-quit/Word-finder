@@ -38,5 +38,4 @@ private:
 	QThread workerThread;
 
 	void loadWordList(const QString& filePath);
-	void initWindow();
 };

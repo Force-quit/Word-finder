@@ -45,7 +45,7 @@ WordFinder::WordFinder(QWidget* parent)
 	QWidget* centralWidget{ new QWidget };
 	centralWidget->setLayout(centralLayout);
 	setCentralWidget(centralWidget);
-	initWindow();
+	setWindowIcon(QIcon(":/images/glass.png"));
 }
 
 QGroupBox* WordFinder::initParameters()
@@ -123,12 +123,6 @@ QVBoxLayout* WordFinder::initResults()
 	resultsLayout->addWidget(resultsList);
 	resultsLayout->addWidget(resultsButton);
 	return resultsLayout;
-}
-
-void WordFinder::initWindow()
-{
-	resize(minimumSizeHint());
-	setWindowIcon(QIcon(APP_PATH + "/glass.png"));
 }
 
 void WordFinder::loadWordList(const QString& filePath)
