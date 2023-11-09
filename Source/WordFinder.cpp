@@ -52,14 +52,14 @@ WordFinder::WordFinder(QWidget* parent)
 
 QGroupBox* WordFinder::initParameters()
 {
-	QGroupBox* parametersGroupBox{ new QGroupBox("Parameters") };
+	QGroupBox* parametersGroupBox{ new QGroupBox(tr("Parameters")) };
 
 	QHBoxLayout* wordListLayout{ new QHBoxLayout };
-	QLabel* wordListLabel{ new QLabel("Word list :") };
+	QLabel* wordListLabel{ new QLabel(tr("Word list :")) };
 	QLabel* wordListPath{ new QLabel(!defaultWordList.isEmpty() ? defaultWordList : "None") };
-	QPushButton* wordListButton{ new QPushButton("Select file") };
+	QPushButton* wordListButton{ new QPushButton(tr("Select file")) };
 	connect(wordListButton, &QPushButton::clicked, [this, wordListPath]() {
-		QString filePath = QFileDialog::getOpenFileName(this, "Select word list", defaultWordList, "text files (*.txt)");
+		QString filePath = QFileDialog::getOpenFileName(this, tr("Select word list"), defaultWordList, tr("text files (*.txt)"));
 		if (!filePath.isEmpty())
 		{
 			loadWordList(filePath);
@@ -73,7 +73,7 @@ QGroupBox* WordFinder::initParameters()
 	wordListLayout->addWidget(wordListButton);
 
 	QHBoxLayout* resultNbLayout{ new QHBoxLayout };
-	QLabel* resultNbLabel{ new QLabel("Max results :") };
+	QLabel* resultNbLabel{ new QLabel(tr("Max results :")) };
 	EQIntLineEdit* resultNbInput{ new EQIntLineEdit(1, 25000) };
 	resultNbInput->setText(QString::number(DEFAULT_NB_RESULTS));
 	connect(resultNbInput, &EQIntLineEdit::valueChanged, wordFinderWorker, &WordFinderWorker::setMaxResults);
@@ -90,7 +90,7 @@ QGroupBox* WordFinder::initParameters()
 QHBoxLayout* WordFinder::initSearch()
 {
 	QHBoxLayout* searchLayout{ new QHBoxLayout };
-	QLabel* searchLabel{ new QLabel("Pattern to find :") };
+	QLabel* searchLabel{ new QLabel(tr("Pattern to find :")) };
 
 	searchInput = new QLineEdit;
 	searchInput->setValidator(new EQTextValidator);
@@ -116,7 +116,7 @@ QVBoxLayout* WordFinder::initResults()
 	QVBoxLayout* resultsLayout{ new QVBoxLayout };
 	resultsList = new QListWidget;
 
-	QPushButton* resultsButton{ new QPushButton("Copy") };
+	QPushButton* resultsButton{ new QPushButton(tr("Copy")) };
 	connect(resultsButton, &QPushButton::clicked, [this]() {
 		if (QListWidgetItem * selectedItem{ resultsList->currentItem() })
 			QGuiApplication::clipboard()->setText(selectedItem->text());
@@ -141,8 +141,8 @@ void WordFinder::loadWordList(const QString& filePath)
 	else
 	{
 		QMessageBox msgBox;
-		msgBox.setText("File error");
-		msgBox.setInformativeText("Error reading file" + filePath);
+		msgBox.setText(tr("File error"));
+		msgBox.setInformativeText(tr("Error reading file") + filePath);
 		msgBox.setStandardButtons(QMessageBox::Ok);
 		msgBox.setDefaultButton(QMessageBox::Ok);
 		msgBox.exec();

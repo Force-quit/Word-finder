@@ -56,4 +56,14 @@
       <Filter>Resource Files</Filter>
     </QtRcc>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\main.fr.qm">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <QtTranslation Include="Resources\main.fr.ts">
+      <Filter>Resource Files</Filter>
+    </QtTranslation>
+  </ItemGroup>
 </Project>
