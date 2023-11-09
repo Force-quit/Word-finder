@@ -7,6 +7,6 @@
         <file>english.txt</file>
     </qresource>
     <qresource prefix="/translations">
-        <file>main.fr.qm</file>
+        <file>fr.qm</file>
     </qresource>
 </RCC>

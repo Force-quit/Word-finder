@@ -7,14 +7,15 @@
 
 int main(int argc, char* argv[])
 {
-	QApplication a(argc, argv);
+	QApplication app(argc, argv);
+
 	QApplication::setStyle(QStyleFactory::create("Fusion"));
+
 	QTranslator translator;
-	if (translator.load(QLocale(), "main", ".", ":/translations", ".qm"))
-	{
-		a.installTranslator(&translator);
-	}
+	if (translator.load(QLocale(), "", "", ":/translations", ".qm"))
+		app.installTranslator(&translator);
+
 	WordFinder w;
 	w.show();
-	return a.exec();
+	return app.exec();
 }

@@ -161,10 +161,10 @@
     <QtRcc Include="Resources\Resource.qrc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\main.fr.qm" />
+    <None Include="Resources\fr.qm" />
   </ItemGroup>
   <ItemGroup>
-    <QtTranslation Include="Resources\main.fr.ts" />
+    <QtTranslation Include="Resources\fr.ts" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
