@@ -2,4 +2,8 @@
     <qresource prefix="/images">
         <file>glass.png</file>
     </qresource>
+    <qresource prefix="/word-lists">
+        <file>francais.txt</file>
+        <file>english.txt</file>
+    </qresource>
 </RCC>

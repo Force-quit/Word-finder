@@ -20,14 +20,16 @@
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QStandardPaths>
+#include <QDirIterator>
+
+QString WordFinder::wordListFolder;
+QString WordFinder::defaultWordList;
 
 WordFinder::WordFinder(QWidget* parent)
-	: QMainWindow(parent), wordList(), wordFinderWorker(), workerThread(), searchInput(), resultsList(),
-	APP_PATH(QCoreApplication::applicationDirPath())
+	: QMainWindow(parent), wordList(), wordFinderWorker(), workerThread(), searchInput(), resultsList()
 {
-	QDir().mkdir(APP_PATH + '/' + WORD_LIST_FOLDER);
-	if (QFile::exists(APP_PATH + '/' + DEFAULT_WORD_LIST))
-		loadWordList(APP_PATH + '/' + DEFAULT_WORD_LIST);
+	setupDefaultWordLists();
 
 	wordFinderWorker = new WordFinderWorker(wordList, DEFAULT_NB_RESULTS);
 
@@ -54,18 +56,18 @@ QGroupBox* WordFinder::initParameters()
 
 	QHBoxLayout* wordListLayout{ new QHBoxLayout };
 	QLabel* wordListLabel{ new QLabel("Word list :") };
-	QLabel* wordListPath{ new QLabel(wordList.size() > 0 ? DEFAULT_WORD_LIST : "None") };
+	QLabel* wordListPath{ new QLabel(!defaultWordList.isEmpty() ? defaultWordList : "None") };
 	QPushButton* wordListButton{ new QPushButton("Select file") };
 	connect(wordListButton, &QPushButton::clicked, [this, wordListPath]() {
-		QString filePath = QFileDialog::getOpenFileName(this, "Select word list", DEFAULT_WORD_LIST, "text files (*.txt)");
+		QString filePath = QFileDialog::getOpenFileName(this, "Select word list", defaultWordList, "text files (*.txt)");
 		if (!filePath.isEmpty())
 		{
 			loadWordList(filePath);
-			wordListPath->setText(QDir().relativeFilePath(filePath));
+			wordListPath->setText(filePath);
 			resultsList->clear();
 			searchInput->clear();
 		}
-		});
+	});
 	wordListLayout->addWidget(wordListLabel);
 	wordListLayout->addWidget(wordListPath);
 	wordListLayout->addWidget(wordListButton);
@@ -146,6 +148,34 @@ void WordFinder::loadWordList(const QString& filePath)
 		msgBox.exec();
 	}
 	file.close();
+}
+
+void WordFinder::setupDefaultWordLists()
+{
+	QString userDocumentsPath(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
+
+	if (!userDocumentsPath.isEmpty())
+	{
+		wordListFolder = userDocumentsPath + "/WordFinder/";
+		defaultWordList = wordListFolder + "francais.txt";
+		
+		QDir().mkdir(wordListFolder);
+
+		QDirIterator it(":/word-lists/", QDirIterator::Subdirectories);
+		while (it.hasNext()) 
+		{
+			QString qResourceWordList = it.next();
+			QString fileNameOnComputer(wordListFolder + qResourceWordList.split("/").last());
+
+			if (!QFile::exists(fileNameOnComputer))
+			{
+				QFile qResourceWordListFile(qResourceWordList);
+				qResourceWordListFile.copy(fileNameOnComputer);
+			}
+		}
+
+		loadWordList(defaultWordList);
+	}
 }
 
 WordFinder::~WordFinder()

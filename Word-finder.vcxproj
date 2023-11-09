@@ -92,7 +92,8 @@
       <AdditionalDependencies>EQUtilities.lib;%(AdditionalDependencies);$(Qt_LIBS_)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /d /i "Word-lists" "$(OutDir)Word-lists"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -105,8 +106,7 @@
       <AdditionalDependencies>EQUtilities.lib;%(AdditionalDependencies);$(Qt_LIBS_)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /d /i "Word-lists" "$(OutDir)Word-lists"
-xcopy /y "$(SolutionDir)$(Platform)\$(Configuration)\EQUtilities.dll" "$(OutDir)"</Command>
+      <Command>xcopy /y "$(SolutionDir)$(Platform)\$(Configuration)\EQUtilities.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>rd /s /q "$(TargetDir)"</Command>

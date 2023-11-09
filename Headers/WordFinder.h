@@ -20,10 +20,10 @@ public:
 	~WordFinder();
 
 private:
-	const unsigned int DEFAULT_NB_RESULTS{ 25 };
-	const QString APP_PATH;
-	inline static const QString WORD_LIST_FOLDER{ "Word-lists" };
-	inline static const QString DEFAULT_WORD_LIST{ WORD_LIST_FOLDER + '/' + "francais.txt"};
+	constexpr static unsigned int DEFAULT_NB_RESULTS{ 25 };
+
+	static QString wordListFolder;
+	static QString defaultWordList;
 
 	QStringList wordList;
 
@@ -38,4 +38,5 @@ private:
 	QThread workerThread;
 
 	void loadWordList(const QString& filePath);
+	void setupDefaultWordLists();
 };
