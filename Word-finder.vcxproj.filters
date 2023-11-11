@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>qrc;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Translations">
+      <UniqueIdentifier>{56acbdbf-0239-49e8-99d4-2ac33dddd023}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\main.cpp">
@@ -57,13 +60,8 @@
     </QtRcc>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\main.fr.qm">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <QtTranslation Include="Resources\main.fr.ts">
-      <Filter>Resource Files</Filter>
+    <QtTranslation Include="Resources\fr.ts">
+      <Filter>Translations</Filter>
     </QtTranslation>
   </ItemGroup>
 </Project>

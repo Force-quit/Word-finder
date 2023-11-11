@@ -1,6 +1,6 @@
-#include <QDir>
 #include "../Headers/WordFinder.h"
 #include "../Headers/WordFinderWorker.h"
+#include <QDir>
 #include <QBoxLayout>
 #include <QGroupBox>
 #include <QLabel>
@@ -10,12 +10,10 @@
 #include <EQUtilities/EQIntLineEdit.h>
 #include <EQUtilities/EQTextValidator.h>
 #include <QLineEdit>
-#include <QRegularExpression>
 #include <QStringList>
 #include <QThread>
-#include <QComboBox>
 #include <QGuiApplication>
-#include <QClipBoard>
+#include <QClipboard>
 #include <QIcon>
 #include <QFile>
 #include <QTextStream>
@@ -23,163 +21,176 @@
 #include <QStandardPaths>
 #include <QDirIterator>
 
-QString WordFinder::wordListFolder;
-QString WordFinder::defaultWordList;
-
-WordFinder::WordFinder(QWidget* parent)
-	: QMainWindow(parent), wordList(), wordFinderWorker(), workerThread(), searchInput(), resultsList()
+WordFinder::WordFinder(QWidget* iParent)
+	: QMainWindow(iParent), mWorkerThread(), mWordFinderWorker{ new WordFinderWorker(DEFAULT_NB_RESULTS) }
 {
 	setupDefaultWordLists();
 
-	wordFinderWorker = new WordFinderWorker(wordList, DEFAULT_NB_RESULTS);
+	QWidget* wCentralWidget{ new QWidget };
 
-	QVBoxLayout* centralLayout{ new QVBoxLayout };
+	QVBoxLayout* wCentralLayout{ new QVBoxLayout };
+	wCentralLayout->setAlignment(Qt::AlignTop);
+	QGroupBox* wParametersGroupBox{ initParameters() };
+	wCentralLayout->addWidget(wParametersGroupBox);
+	QHBoxLayout* wSearchLayout{ initSearch() };
+	wCentralLayout->addLayout(wSearchLayout);
+	QVBoxLayout* wResultsLayout{ initResults() };
+	wCentralLayout->addLayout(wResultsLayout);
 
-	QGroupBox* parametersGroupBox{ initParameters() };
-	QHBoxLayout* searchLayout{ initSearch() };
-	QVBoxLayout* resultsLayout{ initResults() };
-
-	centralLayout->addWidget(parametersGroupBox);
-	centralLayout->addLayout(searchLayout);
-	centralLayout->addLayout(resultsLayout);
-	centralLayout->setAlignment(Qt::AlignTop);
-
-	QWidget* centralWidget{ new QWidget };
-	centralWidget->setLayout(centralLayout);
-	setCentralWidget(centralWidget);
+	wCentralWidget->setLayout(wCentralLayout);
+	setCentralWidget(wCentralWidget);
 	setWindowIcon(QIcon(":/images/glass.png"));
 }
 
 QGroupBox* WordFinder::initParameters()
 {
-	QGroupBox* parametersGroupBox{ new QGroupBox(tr("Parameters")) };
+	QGroupBox* wParametersGroupBox{ new QGroupBox(tr("Parameters")) };
+	QVBoxLayout* wParametersLayout{ new QVBoxLayout };
 
-	QHBoxLayout* wordListLayout{ new QHBoxLayout };
-	QLabel* wordListLabel{ new QLabel(tr("Word list :")) };
-	QLabel* wordListPath{ new QLabel(!defaultWordList.isEmpty() ? defaultWordList : "None") };
-	QPushButton* wordListButton{ new QPushButton(tr("Select file")) };
-	connect(wordListButton, &QPushButton::clicked, [this, wordListPath]() {
-		QString filePath = QFileDialog::getOpenFileName(this, tr("Select word list"), defaultWordList, tr("text files (*.txt)"));
-		if (!filePath.isEmpty())
-		{
-			loadWordList(filePath);
-			wordListPath->setText(filePath);
-			resultsList->clear();
-			searchInput->clear();
-		}
-	});
-	wordListLayout->addWidget(wordListLabel);
-	wordListLayout->addWidget(wordListPath);
-	wordListLayout->addWidget(wordListButton);
+	QHBoxLayout* wWordListLayout{ new QHBoxLayout };
+	QLabel* wWordListLabel{ new QLabel(tr("Word list :")) };
+	wWordListLayout->addWidget(wWordListLabel);
+	mWordListPathLabel = new QLabel(!mDefaultWordListPath.isEmpty() ? mDefaultWordListPath : tr("None"));
+	wWordListLayout->addWidget(mWordListPathLabel);
+	QPushButton* wWordListButton{ new QPushButton(tr("Select file")) };
+	wWordListLayout->addWidget(wWordListButton);
+	wParametersLayout->addLayout(wWordListLayout);
 
-	QHBoxLayout* resultNbLayout{ new QHBoxLayout };
-	QLabel* resultNbLabel{ new QLabel(tr("Max results :")) };
-	EQIntLineEdit* resultNbInput{ new EQIntLineEdit(1, 25000) };
-	resultNbInput->setText(QString::number(DEFAULT_NB_RESULTS));
-	connect(resultNbInput, &EQIntLineEdit::valueChanged, wordFinderWorker, &WordFinderWorker::setMaxResults);
-	resultNbLayout->addWidget(resultNbLabel);
-	resultNbLayout->addWidget(resultNbInput);
+	QHBoxLayout* wResultNbLayout{ new QHBoxLayout };
+	QLabel* wResultNbLabel{ new QLabel(tr("Max results :")) };
+	wResultNbLayout->addWidget(wResultNbLabel);
+	EQIntLineEdit* wResultNbLineEdit{ new EQIntLineEdit(1, MAX_NB_RESULTS) };
+	wResultNbLineEdit->setText(QString::number(DEFAULT_NB_RESULTS));
+	wResultNbLayout->addWidget(wResultNbLineEdit);
+	wParametersLayout->addLayout(wResultNbLayout);
 
-	QVBoxLayout* parametersLayout{ new QVBoxLayout };
-	parametersLayout->addLayout(wordListLayout);
-	parametersLayout->addLayout(resultNbLayout);
-	parametersGroupBox->setLayout(parametersLayout);
-	return parametersGroupBox;
+	connect(wWordListButton, &QPushButton::clicked, this, &WordFinder::selectNewWordList);
+	connect(wResultNbLineEdit, &EQIntLineEdit::valueChanged, mWordFinderWorker, &WordFinderWorker::setMaxResults);
+
+	wParametersGroupBox->setLayout(wParametersLayout);
+	return wParametersGroupBox;
+}
+
+void WordFinder::wordsFound(const QStringList& iWords)
+{
+	mWordListWidget->clear();
+	mWordListWidget->addItems(iWords);
 }
 
 QHBoxLayout* WordFinder::initSearch()
 {
-	QHBoxLayout* searchLayout{ new QHBoxLayout };
-	QLabel* searchLabel{ new QLabel(tr("Pattern to find :")) };
+	QHBoxLayout* wSearchLayout{ new QHBoxLayout };
 
-	searchInput = new QLineEdit;
-	searchInput->setValidator(new EQTextValidator);
-	connect(searchInput, &QLineEdit::textEdited, [this]() {wordFinderWorker->queueWork(); });
-	connect(searchInput, &QLineEdit::textEdited, wordFinderWorker, &WordFinderWorker::findWords);
-	connect(wordFinderWorker, &WordFinderWorker::wordsFound, [this](const QStringList& result) {
-		resultsList->clear();
-		resultsList->addItems(result);
-		resultsList->update(); // Didn't update by itself
-		});
-	connect(&workerThread, &QThread::finished, wordFinderWorker, &QObject::deleteLater);
+	QLabel* wSearchLabel{ new QLabel(tr("Pattern to find :")) };
+	wSearchLayout->addWidget(wSearchLabel);
 
-	wordFinderWorker->moveToThread(&workerThread);
-	workerThread.start();
+	mSearchInput = new QLineEdit;
+	mSearchInput->setValidator(new EQTextValidator);
+	wSearchLayout->addWidget(mSearchInput);
 
-	searchLayout->addWidget(searchLabel);
-	searchLayout->addWidget(searchInput);
-	return searchLayout;
+	// Unavoidable lambda function.. There's a queue of called slots in mWorkerThread
+	// and we cannot trigger a slot when another slot is still executing.
+	// We have to explicitly call WordFinderWorker::stopSearching
+	// so that it executes now.
+	connect(mSearchInput, &QLineEdit::textEdited, [this]() {mWordFinderWorker->stopSearching(); });
+	connect(mSearchInput, &QLineEdit::textEdited, mWordFinderWorker, &WordFinderWorker::findWords);
+	connect(mWordFinderWorker, &WordFinderWorker::wordsFound, this, &WordFinder::wordsFound);
+	connect(&mWorkerThread, &QThread::finished, mWordFinderWorker, &QObject::deleteLater);
+
+	mWordFinderWorker->moveToThread(&mWorkerThread);
+	mWorkerThread.start();
+
+	return wSearchLayout;
 }
 
 QVBoxLayout* WordFinder::initResults()
 {
-	QVBoxLayout* resultsLayout{ new QVBoxLayout };
-	resultsList = new QListWidget;
+	QVBoxLayout* wResultsLayout{ new QVBoxLayout };
+	
+	mWordListWidget = new QListWidget;
+	wResultsLayout->addWidget(mWordListWidget);
 
-	QPushButton* resultsButton{ new QPushButton(tr("Copy")) };
-	connect(resultsButton, &QPushButton::clicked, [this]() {
-		if (QListWidgetItem * selectedItem{ resultsList->currentItem() })
-			QGuiApplication::clipboard()->setText(selectedItem->text());
-		});
+	QPushButton* wResultsButton{ new QPushButton(tr("Copy")) };
+	wResultsLayout->addWidget(wResultsButton);
+	
+	connect(wResultsButton, &QPushButton::clicked, this, &WordFinder::copySelectedWord);
 
-	resultsLayout->addWidget(resultsList);
-	resultsLayout->addWidget(resultsButton);
-	return resultsLayout;
+	return wResultsLayout;
 }
 
-void WordFinder::loadWordList(const QString& filePath)
+void WordFinder::loadWordList(const QString& iFilePath)
 {
-	QFile file(filePath);
-	if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+	QFile wFile(iFilePath);
+	if (wFile.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
-		wordList.clear();
-		QTextStream in{ &file };
-		while (!in.atEnd())
-			wordList.append(in.readLine());
-		wordList.squeeze();
+		QStringList wStringList;
+		QTextStream wInputStream{ &wFile };
+		while (!wInputStream.atEnd())
+			wStringList.append(wInputStream.readLine());
+		wStringList.squeeze();
+		mWordFinderWorker->setWordList(std::move(wStringList));
 	}
 	else
 	{
-		QMessageBox msgBox;
-		msgBox.setText(tr("File error"));
-		msgBox.setInformativeText(tr("Error reading file") + filePath);
-		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setDefaultButton(QMessageBox::Ok);
-		msgBox.exec();
+		QMessageBox wMsgBox;
+		wMsgBox.setText(tr("File error"));
+		wMsgBox.setInformativeText(tr("Error reading file") + iFilePath);
+		wMsgBox.setStandardButtons(QMessageBox::Ok);
+		wMsgBox.setDefaultButton(QMessageBox::Ok);
+		wMsgBox.exec();
 	}
-	file.close();
+	wFile.close();
 }
 
 void WordFinder::setupDefaultWordLists()
 {
-	QString userDocumentsPath(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
+	QString wUserDocumentsPath(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
 
-	if (!userDocumentsPath.isEmpty())
+	if (!wUserDocumentsPath.isEmpty())
 	{
-		wordListFolder = userDocumentsPath + "/WordFinder/";
-		defaultWordList = wordListFolder + "francais.txt";
-		
-		QDir().mkdir(wordListFolder);
+		mWordListFolder = wUserDocumentsPath + "/WordFinder/";
+		QDir().mkdir(mWordListFolder);
 
-		QDirIterator it(":/word-lists/", QDirIterator::Subdirectories);
-		while (it.hasNext()) 
+		QDirIterator wDirIterator(":/word-lists/", QDirIterator::Subdirectories);
+		while (wDirIterator.hasNext())
 		{
-			QString qResourceWordList = it.next();
-			QString fileNameOnComputer(wordListFolder + qResourceWordList.split("/").last());
+			QString wWordListPathInResources = wDirIterator.next();
+			QString wWordListPath(mWordListFolder + wWordListPathInResources.split("/").last());
 
-			if (!QFile::exists(fileNameOnComputer))
+			if (!QFile::exists(wWordListPath))
 			{
-				QFile qResourceWordListFile(qResourceWordList);
-				qResourceWordListFile.copy(fileNameOnComputer);
+				QFile wWordListFile(wWordListPathInResources);
+				wWordListFile.copy(wWordListPath);
 			}
 		}
 
-		loadWordList(defaultWordList);
+		mDefaultWordListPath = mWordListFolder + "francais.txt";
+		loadWordList(mDefaultWordListPath);
 	}
+}
+
+void WordFinder::selectNewWordList()
+{
+	QString wFilePath = QFileDialog::getOpenFileName(this, tr("Select word list"), mDefaultWordListPath, tr("text files (*.txt)"));
+	if (!wFilePath.isEmpty())
+	{
+		loadWordList(wFilePath);
+		mWordListPathLabel->setText(wFilePath);
+		mWordListWidget->clear();
+		mSearchInput->clear();
+	}
+}
+
+void WordFinder::copySelectedWord()
+{
+	QListWidgetItem* wSelectedItem{ mWordListWidget->currentItem() };
+
+	if (wSelectedItem)
+		QGuiApplication::clipboard()->setText(wSelectedItem->text());
 }
 
 WordFinder::~WordFinder()
 {
-	workerThread.quit();
-	workerThread.wait();
+	mWorkerThread.quit();
+	mWorkerThread.wait();
 }

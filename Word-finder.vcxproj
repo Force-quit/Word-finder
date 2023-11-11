@@ -161,9 +161,6 @@
     <QtRcc Include="Resources\Resource.qrc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\fr.qm" />
-  </ItemGroup>
-  <ItemGroup>
     <QtTranslation Include="Resources\fr.ts" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

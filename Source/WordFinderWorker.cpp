@@ -1,46 +1,52 @@
 #include "../Headers/WordFinderWorker.h"
 #include <QStringList>
 #include <QString>
+#include <QTimer>
+#include <QThread>
+#include <QMutex>
+#include <QDebug>
 
-WordFinderWorker::WordFinderWorker(const QStringList& wordList, const unsigned int maxResults)
-	: wordListRef(wordList), maxResults(maxResults), nbCalls()
+WordFinderWorker::WordFinderWorker(quint16 iMaxResults)
+	: mMaxResults{ iMaxResults }, mStopSearching{}, mWordList()
 {}
 
-WordFinderWorker::~WordFinderWorker() {}
-
-void WordFinderWorker::queueWork()
+void WordFinderWorker::setWordList(QStringList&& iWordList)
 {
-	++nbCalls;
+	mWordList = iWordList;
 }
 
-void WordFinderWorker::setMaxResults(const unsigned int nbResults)
+void WordFinderWorker::stopSearching()
 {
-	maxResults = nbResults;
+	mStopSearching = true;
 }
 
-void WordFinderWorker::findWords(const QString& pattern)
+void WordFinderWorker::setMaxResults(quint16 iNbResults)
 {
-	QStringList results;
-	if (!pattern.isEmpty())
+	mMaxResults = iNbResults;
+}
+
+void WordFinderWorker::findWords(const QString& iPattern)
+{
+	QStringList wResults;
+
+	if (!iPattern.isEmpty())
 	{
-		unsigned int counter = 0;
-		for (unsigned int i = 0; i < wordListRef.size() && counter != maxResults && nbCalls == 1; ++i)
+		mStopSearching = false;
+
+		for (auto& wWord : mWordList)
 		{
-			if (wordListRef[i].contains(pattern, Qt::CaseInsensitive))
+			if (mStopSearching)
+				return;
+
+			if (wWord.contains(iPattern, Qt::CaseInsensitive))
 			{
-				results.append(wordListRef[i]);
-				++counter;
+				wResults.append(wWord);
+
+				if (wResults.size() == mMaxResults)
+					break;
 			}
 		}
 	}
 
-	if (nbCalls > 1)
-	{
-		--nbCalls;
-		return;
-	}
-
-	--nbCalls;
-	if (!results.isEmpty())
-		emit wordsFound(results);
+	emit wordsFound(wResults);
 }
