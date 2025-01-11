@@ -10,7 +10,7 @@
 #include <QBoxLayout>
 #include <QLabel>
 #include "QWordFinderWorker.hpp"
-#include <QThread>
+#include <EQThread.hpp>
 
 class QWordFinder : public QMainWindow
 {
@@ -18,7 +18,6 @@ class QWordFinder : public QMainWindow
 
 public:
 	QWordFinder();
-	~QWordFinder();
 
 private slots:
 	void setFoundWords(const QStringList& iWords);
@@ -43,5 +42,5 @@ private:
 	QListWidget* mWordListWidget{};
 	QLabel* mWordListPathLabel{};
 	QWordFinderWorker* mWordFinderWorker{ new QWordFinderWorker(DEFAULT_NB_RESULTS) };
-	QThread mWorkerThread;
+	EQThread mWorkerThread;
 };
