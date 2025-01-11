@@ -21,17 +21,20 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(EQUtilities)
 
 set(SOURCE
-    src/WordFinder.h
+    src/WordFinder.hpp
     src/WordFinder.cpp
-    src/WordFinderWorker.h
+    src/WordFinderWorker.hpp
     src/WordFinderWorker.cpp
     src/main.cpp
 )
 
 qt_add_executable(Word-finder ${SOURCE})
 target_link_libraries(Word-finder PRIVATE Qt6::Widgets EQUtilities)
-set_target_properties(Word-finder PROPERTIES
-    WIN32_EXECUTABLE ON
-)
+
+if(WIN32)
+    set_target_properties(Word-finder PROPERTIES
+        WIN32_EXECUTABLE ON
+    )
+endif()
 
 add_subdirectory(resources)

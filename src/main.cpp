@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QTranslator>
 #include <QLocale>
-#include "WordFinder.h"
+#include "WordFinder.hpp"
 
 int main(int argc, char* argv[])
 {

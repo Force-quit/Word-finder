@@ -9,7 +9,7 @@
 #include <QGroupBox>
 #include <QBoxLayout>
 #include <QLabel>
-#include "WordFinderWorker.h"
+#include "WordFinderWorker.hpp"
 #include <QThread>
 
 class WordFinder : public QMainWindow

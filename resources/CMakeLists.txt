@@ -7,3 +7,6 @@ qt_add_resources(Word-finder imageresources
     PREFIX "/images"
     FILES icon.png
 )
+
+file(COPY english.txt DESTINATION ${CMAKE_BINARY_DIR}/resources)
+file(COPY francais.txt DESTINATION ${CMAKE_BINARY_DIR}/resources)

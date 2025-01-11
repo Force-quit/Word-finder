@@ -1,5 +1,5 @@
-#include "WordFinder.h"
-#include "WordFinderWorker.h"
+#include "WordFinder.hpp"
+#include "WordFinderWorker.hpp"
 #include <QDir>
 #include <QBoxLayout>
 #include <QGroupBox>

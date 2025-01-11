@@ -1,4 +1,4 @@
-#include "WordFinderWorker.h"
+#include "WordFinderWorker.hpp"
 #include <QStringList>
 #include <QString>
 #include <QTimer>
