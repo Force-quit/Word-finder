@@ -16,7 +16,7 @@ qt_standard_project_setup()
 include(FetchContent)
 FetchContent_Declare(
     EQUtilities
-    URL https://github.com/Force-quit/EQUtilities/archive/refs/tags/v1.0.0.zip
+    URL https://github.com/Force-quit/EQUtilities/archive/refs/tags/v1.1.0.zip
 )
 FetchContent_MakeAvailable(EQUtilities)
 

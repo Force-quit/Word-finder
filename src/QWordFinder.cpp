@@ -95,9 +95,8 @@ QHBoxLayout* QWordFinder::initSearch()
 	connect(mSearchLineEdit, &QLineEdit::textEdited, [this]() {mWordFinderWorker->stopSearching(); });
 	connect(mSearchLineEdit, &QLineEdit::textEdited, mWordFinderWorker, &QWordFinderWorker::findWords);
 	connect(mWordFinderWorker, &QWordFinderWorker::wordsFound, this, &QWordFinder::setFoundWords);
-	connect(&mWorkerThread, &QThread::finished, mWordFinderWorker, &QObject::deleteLater);
 
-	mWordFinderWorker->moveToThread(&mWorkerThread);
+	mWorkerThread.moveObjectToThread(mWordFinderWorker);
 	mWorkerThread.start();
 
 	return layout;
@@ -217,10 +216,4 @@ void QWordFinder::setFoundWords(const QStringList& iWords)
 {
 	mWordListWidget->clear();
 	mWordListWidget->addItems(iWords);
-}
-
-QWordFinder::~QWordFinder()
-{
-	mWorkerThread.quit();
-	mWorkerThread.wait();
 }
