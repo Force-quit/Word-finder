@@ -1,5 +1,5 @@
-#include "../Headers/WordFinder.h"
-#include "../Headers/WordFinderWorker.h"
+#include "WordFinder.h"
+#include "WordFinderWorker.h"
 #include <QDir>
 #include <QBoxLayout>
 #include <QGroupBox>
@@ -7,8 +7,8 @@
 #include <QPushButton>
 #include <QString>
 #include <QFileDialog>
-#include <EQUtilities/EQIntLineEdit.h>
-#include <EQUtilities/EQTextValidator.h>
+#include <EQIntLineEdit.hpp>
+#include <EQTextValidator.hpp>
 #include <QLineEdit>
 #include <QStringList>
 #include <QThread>
@@ -39,7 +39,7 @@ WordFinder::WordFinder(QWidget* iParent)
 
 	wCentralWidget->setLayout(wCentralLayout);
 	setCentralWidget(wCentralWidget);
-	setWindowIcon(QIcon(":/images/glass.png"));
+	setWindowIcon(QIcon(":/images/icon.png"));
 }
 
 QGroupBox* WordFinder::initParameters()
@@ -59,8 +59,7 @@ QGroupBox* WordFinder::initParameters()
 	QHBoxLayout* wResultNbLayout{ new QHBoxLayout };
 	QLabel* wResultNbLabel{ new QLabel(tr("Max results :")) };
 	wResultNbLayout->addWidget(wResultNbLabel);
-	EQIntLineEdit* wResultNbLineEdit{ new EQIntLineEdit(1, MAX_NB_RESULTS) };
-	wResultNbLineEdit->setText(QString::number(DEFAULT_NB_RESULTS));
+	EQIntLineEdit* wResultNbLineEdit{ new EQIntLineEdit(1, DEFAULT_NB_RESULTS, MAX_NB_RESULTS) };
 	wResultNbLayout->addWidget(wResultNbLineEdit);
 	wParametersLayout->addLayout(wResultNbLayout);
 

@@ -45,5 +45,4 @@ private:
 
 	WordFinderWorker* mWordFinderWorker;
 	QThread mWorkerThread;
-
 };
