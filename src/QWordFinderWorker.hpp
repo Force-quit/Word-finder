@@ -4,24 +4,24 @@
 #include <QStringList>
 #include <QString>
 
-class WordFinderWorker : public QObject
+class QWordFinderWorker : public QObject
 {
 	Q_OBJECT
 
 public:
-	WordFinderWorker(quint16 mMaxResults);
+	QWordFinderWorker(quint16 iMaxResults);
 	void setWordList(QStringList&& iWordList);
 
 public slots:
 	void stopSearching();
-	void findWords(const QString& pattern);
-	void setMaxResults(quint16 nbResults);
+	void findWords(const QString& iPattern);
+	void setMaxResults(quint16 iMaxResults);
 
 signals:
-	void wordsFound(const QStringList& results);
+	void wordsFound(const QStringList& iResults);
 
 private:
 	QStringList mWordList;
+	bool mStopSearching{};
 	quint16 mMaxResults;
-	bool mStopSearching;
 };

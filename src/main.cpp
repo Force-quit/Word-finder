@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QTranslator>
 #include <QLocale>
-#include "WordFinder.hpp"
+#include "QWordFinder.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 		app.installTranslator(&translator);
 	}
 
-	WordFinder w;
+	QWordFinder w;
 	w.show();
 	return app.exec();
 }

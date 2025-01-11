@@ -21,10 +21,10 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(EQUtilities)
 
 set(SOURCE
-    src/WordFinder.hpp
-    src/WordFinder.cpp
-    src/WordFinderWorker.hpp
-    src/WordFinderWorker.cpp
+    src/QWordFinder.hpp
+    src/QWordFinder.cpp
+    src/QWordFinderWorker.hpp
+    src/QWordFinderWorker.cpp
     src/main.cpp
 )
 
