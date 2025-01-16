@@ -92,7 +92,15 @@ QHBoxLayout* QWordFinder::initSearch()
 	// and we cannot trigger a slot when another slot is still executing.
 	// We have to explicitly call QWordFinderWorker::stopSearching
 	// so that it executes now.
-	connect(mSearchLineEdit, &QLineEdit::textEdited, [this]() {mWordFinderWorker->stopSearching(); });
+	connect(mSearchLineEdit, &QLineEdit::textEdited, [this]() 
+	{
+		mWordFinderWorker->stopSearching();
+		if (!mSearchLineEdit->text().isEmpty())
+		{
+			mWordListWidget->clear();
+			mWordListWidget->addItem(tr("Searching..."));
+		}
+	});
 	connect(mSearchLineEdit, &QLineEdit::textEdited, mWordFinderWorker, &QWordFinderWorker::findWords);
 	connect(mWordFinderWorker, &QWordFinderWorker::wordsFound, this, &QWordFinder::setFoundWords);
 
